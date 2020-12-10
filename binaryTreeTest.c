@@ -3,6 +3,14 @@
 
 #define len(x) sizeof(x) / sizeof(x[0])
 
+void intFormatter(void* valuep, char* buffer) {
+    sprintf(buffer, "%i\n", *(int*)valuep);
+}
+
+void intPrinter(void* valuep) {
+    printf("%d\n", *(int*)valuep);
+}
+
 int main() {
 
     int vals[] = { 0, 1, 5, 7, 8, 9, 10 };
@@ -19,7 +27,9 @@ int main() {
     root->rightNode = nodes[5];
     nodes[5]->leftNode = nodes[4];
     nodes[4]->leftNode = nodes[6];
-    drawTree(root);
-
+    drawTree(root, intFormatter);
+    inOrderTraverse(root, intPrinter);
+    puts("Post order:");
+    reverseOrderTraverse(root, intPrinter);
     freeBST(root, false);
 }

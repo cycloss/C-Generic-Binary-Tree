@@ -33,7 +33,7 @@ static char* concatStrsToNew(char* str1, char* str2) {
     return both;
 }
 
-static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bottom) {
+static char* createTreeDiagram(void (*valueFormatter)(void*, char*), binaryNode* node, char* top, char* root, char* bottom) {
     //for if one of the forks is null
     if (!node) {
         return concatStrsToNew(root, "null\n");
@@ -41,10 +41,11 @@ static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bo
 
     //for if is a leaf
     if (!node->leftNode && !node->rightNode) {
-        char formatted[20];
-        sprintf(formatted, "%i\n", *(int*)node->valuep);
+        char buffer[20];
+        valueFormatter(node->valuep, buffer);
+
         //if top leaf, root will be ┌──, if bottom leaf └──
-        char* rootAndVal = concatStrsToNew(root, formatted);
+        char* rootAndVal = concatStrsToNew(root, buffer);
         return rootAndVal;
     }
 
@@ -53,9 +54,10 @@ static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bo
     char* bottomNew = concatStrsToNew(top, "|  ");
     //top should not be freed as top was a previous top new which will be freed after top next has been created below
     //same applies to root and bottom, left in for clarity
+    //if they were from the first time the function was entered, don't need to be freed anyway as they weren't dynamically allocated
     // free(top);
 
-    char* topNext = createTreeDiagram(node->rightNode, topNew, rootNew, bottomNew);
+    char* topNext = createTreeDiagram(valueFormatter, node->rightNode, topNew, rootNew, bottomNew);
     free(topNew);
     free(rootNew);
     free(bottomNew);
@@ -65,9 +67,9 @@ static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bo
     // free(root);
     free(topNext);
 
-    char formatted[20];
-    sprintf(formatted, "%i\n", *(int*)node->valuep);
-    char* topAndRootAndVal = concatStrsToNew(topAndRoot, formatted);
+    char buffer[20];
+    valueFormatter(node->valuep, buffer);
+    char* topAndRootAndVal = concatStrsToNew(topAndRoot, buffer);
     free(topAndRoot);
 
     char* topNew2 = concatStrsToNew(bottom, "|  ");
@@ -76,7 +78,7 @@ static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bo
     // do not free, see above
     // free(bottom);
 
-    char* bottomNext = createTreeDiagram(node->leftNode, topNew2, rootNew2, bottomNew2);
+    char* bottomNext = createTreeDiagram(valueFormatter, node->leftNode, topNew2, rootNew2, bottomNew2);
     free(topNew2);
     free(rootNew2);
     free(bottomNew2);
@@ -87,9 +89,27 @@ static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bo
     return final;
 }
 
-void drawTree(binaryNode* rootNode) {
+void drawTree(binaryNode* rootNode, void (*valueFormatter)(void*, char*)) {
 
-    char* fullTree = createTreeDiagram(rootNode, "", "", "");
+    char* fullTree = createTreeDiagram(valueFormatter, rootNode, "", "", "");
     printf("%s\n", fullTree);
     free(fullTree);
+}
+
+void inOrderTraverse(binaryNode* rootNode, void (*printer)(void*)) {
+    if (!rootNode) {
+        return;
+    }
+    inOrderTraverse(rootNode->leftNode, printer);
+    printer(rootNode->valuep);
+    inOrderTraverse(rootNode->rightNode, printer);
+}
+
+void reverseOrderTraverse(binaryNode* rootNode, void (*printer)(void*)) {
+    if (!rootNode) {
+        return;
+    }
+    reverseOrderTraverse(rootNode->rightNode, printer);
+    printer(rootNode->valuep);
+    reverseOrderTraverse(rootNode->leftNode, printer);
 }
