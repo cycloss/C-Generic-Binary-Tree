@@ -5,7 +5,7 @@
 
 int main() {
 
-    int vals[] = { 0, 1, 5, 7, 8, 9 };
+    int vals[] = { 0, 1, 5, 7, 8, 9, 10 };
     binaryNode* nodes[len(vals)];
 
     for (int i = 0; i < len(vals); i++) {
@@ -18,6 +18,7 @@ int main() {
     nodes[1]->rightNode = nodes[2];
     root->rightNode = nodes[5];
     nodes[5]->leftNode = nodes[4];
+    nodes[4]->leftNode = nodes[6];
     drawTree(root);
 
     freeBST(root, false);

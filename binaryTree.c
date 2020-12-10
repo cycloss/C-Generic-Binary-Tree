@@ -48,10 +48,12 @@ static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bo
         return rootAndVal;
     }
 
-    char* topNew = concatStrsToNew(top, " ");
+    char* topNew = concatStrsToNew(top, "   ");
     char* rootNew = concatStrsToNew(top, "┌──");
-    char* bottomNew = concatStrsToNew(top, "| ");
-    free(top);
+    char* bottomNew = concatStrsToNew(top, "|  ");
+    //top should not be freed as top was a previous top new which will be freed after top next has been created below
+    //same applies to root and bottom, left in for clarity
+    // free(top);
 
     char* topNext = createTreeDiagram(node->rightNode, topNew, rootNew, bottomNew);
     free(topNew);
@@ -59,7 +61,8 @@ static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bo
     free(bottomNew);
 
     char* topAndRoot = concatStrsToNew(topNext, root);
-    free(root);
+    // do not free, see above
+    // free(root);
     free(topNext);
 
     char formatted[20];
@@ -67,10 +70,11 @@ static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bo
     char* topAndRootAndVal = concatStrsToNew(topAndRoot, formatted);
     free(topAndRoot);
 
-    char* topNew2 = concatStrsToNew(bottom, "| ");
+    char* topNew2 = concatStrsToNew(bottom, "|  ");
     char* rootNew2 = concatStrsToNew(bottom, "└──");
-    char* bottomNew2 = concatStrsToNew(bottom, " ");
-    free(bottom);
+    char* bottomNew2 = concatStrsToNew(bottom, "   ");
+    // do not free, see above
+    // free(bottom);
 
     char* bottomNext = createTreeDiagram(node->leftNode, topNew2, rootNew2, bottomNew2);
     free(topNew2);
@@ -84,11 +88,8 @@ static char* createTreeDiagram(binaryNode* node, char* top, char* root, char* bo
 }
 
 void drawTree(binaryNode* rootNode) {
-    char* top = calloc(1, sizeof(char));
-    char* rt = calloc(1, sizeof(char));
-    char* bottom = calloc(1, sizeof(char));
 
-    char* fullTree = createTreeDiagram(rootNode, top, rt, bottom);
+    char* fullTree = createTreeDiagram(rootNode, "", "", "");
     printf("%s\n", fullTree);
     free(fullTree);
 }

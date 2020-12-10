@@ -6,4 +6,4 @@
 !LICENSE
 .vscode/*
 .DS_Store
-test.dSYM
+*.dSYM
